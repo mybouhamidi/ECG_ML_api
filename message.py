@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from typing import Dict
-
-# import pandas as pd
+from typing import List
 import numpy as np
 import torch
 import torch.nn as nn
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -12,7 +11,7 @@ from pydantic import BaseModel
 
 
 class Item(BaseModel):
-    data: list[float] = None
+    data: List[float]
 
 
 def nin_block(in_channels, out_channels, kernel_size, padding, strides):
@@ -59,7 +58,7 @@ async def classify(heartbeat: Item):
 
     class_names = {0: "N", 1: "S", 2: "V", 3: "F", 4: "Q"}
     item = heartbeat.dict()
-    # x = heartbeat['data']
+
     x = np.array(item["data"], dtype="f").reshape(1, 1, 187)
 
     y = model(torch.tensor(x).to(device=device))

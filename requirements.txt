@@ -1,3 +1,5 @@
 fastapi[all]
 numpy
 torch
+typing
+pydantic
