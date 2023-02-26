@@ -1,16 +1,31 @@
-from fastapi import FastAPI
-from typing import List
+from fastapi import Request, FastAPI
+
+# from typing import List
 import numpy as np
 import torch
 import torch.nn as nn
 
+# from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+
+# import json
+
+
+# class Item(BaseModel):
+#     data: List[float]
+
+
 app = FastAPI()
 
-from pydantic import BaseModel
+origins = ["*"]
 
-
-class Item(BaseModel):
-    data: List[float]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def nin_block(in_channels, out_channels, kernel_size, padding, strides):
@@ -50,19 +65,24 @@ def get_model():
 
 
 @app.post("/predict")
-async def classify(heartbeat: Item):
+async def classify(heartbeat: Request):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = get_model().to(device=device)
     model.load_state_dict(torch.load("best_model0.99.pt"))
 
     class_names = {0: "N", 1: "S", 2: "V", 3: "F", 4: "Q"}
-    item = heartbeat.dict()
+    # item = Item(heartbeat["data"])
+    item = await heartbeat.json()
+    # print(item)
+    # item = json.loads(item)
+    # print(item["data"])
 
-    x = np.array(item["data"], dtype="f").reshape(1, 1, 187)
+    x = np.array(item["data"][:-2], dtype="f").reshape(1, 1, 187)
 
     y = model(torch.tensor(x).to(device=device))
     y = torch.argmax(y, dim=1).cpu().numpy()
 
     i = y.tolist()
     return {"result": class_names[i[0]]}
+    # return await heartbeat.json()
 
