@@ -1,5 +1,6 @@
 fastapi[all]
 numpy
-torch
+tensorflow
+pandas
 typing
 pydantic
