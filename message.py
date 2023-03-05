@@ -9,8 +9,6 @@ from tensorflow import keras
 
 app = FastAPI()
 
-from pydantic import BaseModel
-
 
 class Item(BaseModel):
     data: List[float]
