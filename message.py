@@ -15,6 +15,7 @@ origins = [
     "http://www.e-hospital.ca/ecg",
     "http://localhost:5000",
     "http://localhost:8080",
+    "*"
 ]
 
 app.add_middleware(
