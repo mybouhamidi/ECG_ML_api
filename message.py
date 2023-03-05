@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from typing import List
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
 
 import pandas as pd
 
@@ -8,6 +9,21 @@ from pydantic import BaseModel
 from tensorflow import keras
 
 app = FastAPI()
+
+
+origins = [
+    "http://www.e-hospital.ca/ecg",
+    "http://localhost:5000",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class Item(BaseModel):
